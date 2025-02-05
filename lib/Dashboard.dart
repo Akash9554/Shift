@@ -76,7 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<String> getAccessToken() async {
     // Your client ID and client secret obtained from Google Cloud Console
-    final serviceAccountJson = {
+    /*final serviceAccountJson = {
       "type": "service_account",
       "project_id": "star-staff-rostering",
       "private_key_id": "445177fb5e2e2670f719d02aa942af979470cdd1",
@@ -88,7 +88,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-t7ru9%40star-staff-rostering.iam.gserviceaccount.com",
       "universe_domain": "googleapis.com"
-    };
+    };*/
 
     List<String> scopes = [
       "https://www.googleapis.com/auth/userinfo.email",
