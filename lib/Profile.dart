@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -27,16 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   List<int> _numberList = List.generate(201, (index) => index - 100);
   List<int> _numberListsec = List.generate(201, (index) => index - 100);
 
-  PickedFile? _image;
 
-  Future<void> _choosePhoto() async {
-    final ImagePicker _picker = ImagePicker();
-    final pickedImage = await _picker.getImage(source: ImageSource.gallery);
 
-    setState(() {
-      _image = pickedImage;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,18 +260,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               SizedBox(height: 10),
               Center(
-                child: Column(
-                  children: [
-                    _image == null
-                        ? Text('No image selected')
-                        : Image.file(File(_image!.path)),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: _choosePhoto,
-                      child: Text('Choose Photo'),
-                    ),
-                  ],
-                ),
+
               ),
             ],
           ),

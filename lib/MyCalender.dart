@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shift/url_constants.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'SideMenu.dart';
 import 'login.dart';
@@ -26,8 +28,6 @@ class _MyCalendarsState extends State<MyCalendars> {
 
   late List<DateTime> _daysOfMonth;
   DateTime? _selectedDate;
-
-
   List<MyCalender> manufacturerList = [];
   String? message = '';
   String? messageSec = '';
@@ -42,6 +42,7 @@ class _MyCalendarsState extends State<MyCalendars> {
   int currentday = 0;
   int currentmonth = 0;
   int currentyear = 0;
+  Set<String> processedDates = Set<String>();
 
   @override
   void initState() {
@@ -59,6 +60,7 @@ class _MyCalendarsState extends State<MyCalendars> {
   }
 
   void getupdateddatafirst(String month, String year) {
+    EasyLoading.show(status: 'loading...');
     fetchdata = ProcedureApiService.fetchRouteData(user_id, month, year);
     fetchDataa();
   }
@@ -86,41 +88,52 @@ class _MyCalendarsState extends State<MyCalendars> {
     }
     if (loopFinished) {
       setState(() {
-        _daysOfMonth.addAll(_daysOfMonthss);
+        _daysOfMonth=_daysOfMonthss;
       });
     }
     setState(() {
       manufacturerList.clear();
       manufacturerList = manufacturerListResponse.data!;
-      for (int i = 0; i < manufacturerList.length; i++) {
-        if (i == 0) {
-          DateTime date22 = DateTime(int.parse(manufacturerList[i].year!),
-              int.parse(manufacturerList[i].month!),
-              int.parse(manufacturerList[i].day!));
-          _selectedDate = date22;
-          DateFormat formatter2 = DateFormat('dd MMM yyyy');
-          String newDateString2 = formatter2.format(_selectedDate!);
-          dateSelection = newDateString2;
-          if (!(manufacturerList[i].checkBlock == null)) {
-            message = manufacturerList[i].checkBlock;
-          } else {
-            message = '';
-          }
+      if (manufacturerList.isNotEmpty) {
+        for (int i = 0; i < manufacturerList.length; i++) {
+          DateTime date22 = DateTime(
+            int.parse(manufacturerList[i].year!),
+            int.parse(manufacturerList[i].month!),
+            int.parse(manufacturerList[i].day!),
+          );
 
-          List<String> reminderData = manufacturerList[i].reminderAvailabilityData ?? [];
-          if (reminderData.isEmpty) {
-            messageSec = '';
-            colorsec=Colors.white;
-          } else {
-            String colorCode = manufacturerList[i].dateBackgroundColor!; // Assuming person.colorCode is a string representing the color code
-            colorCode = colorCode.replaceAll('#', '');
-            colorsec = Color(int.parse('0xFF$colorCode'));
-            messageSec = reminderData.join(', ');
-          }
+          DateTime currentDate = DateTime.now();
+          // Compare only the year, month, and day
+          if (currentDate.year == date22.year &&
+              currentDate.month == date22.month &&
+              currentDate.day == date22.day) {
+            _selectedDate = date22;
 
+            // Format the selected date
+            DateFormat formatter2 = DateFormat('dd MMM yyyy');
+            dateSelection = formatter2.format(_selectedDate!);
+
+            // Assign message from `checkBlock`
+            message = manufacturerList[i].checkBlock ?? '';
+
+            // Handle `reminderAvailabilityData`
+            List<String> reminderData =
+                manufacturerList[i].reminderAvailabilityData ?? [];
+            if (reminderData.isEmpty) {
+              messageSec = '';
+              colorsec = Colors.white;
+            } else {
+              String colorCode =
+                  manufacturerList[i].dateBackgroundColor ?? 'FFFFFF';
+              colorCode = colorCode.replaceAll('#', '');
+              colorsec = Color(int.parse('0xFF$colorCode'));
+              messageSec = reminderData.join(', ');
+            }
+          }
         }
       }
     });
+
   }
 
   void updateManufacturerList(int indexno) {
@@ -140,8 +153,6 @@ class _MyCalendarsState extends State<MyCalendars> {
       DateFormat formatter2 = DateFormat('dd MMM yyyy');
       String newDateString2 = formatter2.format(dd);
       dateSelection = newDateString2;
-
-
       if (!(manufacturerList[indexno].checkBlock == null)) {
         message = manufacturerList[indexno].checkBlock;
       } else {
@@ -246,7 +257,7 @@ class _MyCalendarsState extends State<MyCalendars> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'My Calender',
+                                'My Calendar',
                                 style: TextStyle(
                                   fontFamily: 'Poppins_normal',
                                   fontWeight: FontWeight.w500,
@@ -285,97 +296,95 @@ class _MyCalendarsState extends State<MyCalendars> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          color: Colors.transparent,
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: _daysOfMonth
-                                  .asMap()
-                                  .entries
-                                  .map((entry) {
-                                int index = entry.key;
-                                DateTime date = entry.value;
-                                bool isSelected = _selectedDate != null
-                                    ? date == _selectedDate
-                                    : false;
-                                return GestureDetector(
-                                  onTap: () {
-                                    updateManufacturerList(index);
-                                  },
-                                  child: Container(
-                                    width: 60,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? Color(0xFF142247)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? Color(0xFF142247)
-                                            : Colors.transparent,
-                                        width: 4,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .center,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            DateFormat.MMM().format(date),
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : Color(0xFF142247),
-                                            ),
 
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            '${date.day}',
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : Color(0xFF142247),
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            DateFormat.E().format(date),
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected
-                                                  ? Colors.white
-                                                  : Color(0xFF142247),
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
+                        TableCalendar(
+                          calendarFormat: CalendarFormat.month,
+                          onDaySelected: (selectedDate, focusedDay) {
+                            int selectedIndex = _daysOfMonth.indexWhere((date) => isSameDay(date, selectedDate));
+                            if (selectedIndex != -1) {
+                              setState(() {
+                                _selectedDate = selectedDate;
+                              });
+                              processedDates.clear();
+                              updateManufacturerList(selectedIndex);
+                            }
+                          },
+                          headerVisible: true,
+                          daysOfWeekStyle: DaysOfWeekStyle(
+                            weekdayStyle: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: const Color(0xff000000),
+
+                            ),
+                            weekendStyle: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: const Color(0xff000000),
+                            ),),
+                          headerStyle: HeaderStyle(
+                            titleTextStyle: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 17.0),
+                            formatButtonVisible: false,
+                            titleCentered: true,
+                            headerMargin: EdgeInsets.all(15.0),
+                            rightChevronVisible: false,
+                            leftChevronVisible: false,
+                            headerPadding: EdgeInsets.all(8.0),),
+                          availableGestures: AvailableGestures.all,
+                          availableCalendarFormats: const {
+                            CalendarFormat.month: 'Month',
+                          },
+                          focusedDay: _daysOfMonth.first,
+                          firstDay: _daysOfMonth.first,
+                          lastDay: _daysOfMonth.last,
+                          calendarBuilders: CalendarBuilders(
+                            markerBuilder: (context, date, events) {
+                              processedDates.clear();
+                              String dateString = '${date.year}-${date.month}-${date.day}';
+                              if (!processedDates.contains(dateString) && _isSpecialDate(date)) {
+                                processedDates.add(dateString);
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF142247),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${date.day}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontFamily: 'Poppins_normal',
                                     ),
                                   ),
                                 );
-                              }).toList(),
-                            ),
+                              } else {
+                                if (!_isSpecialDate(date)) {
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        borderRadius: BorderRadius.circular(1),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        '${date.day}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontFamily: 'Poppins_normal',
+                                        ),
+                                      ),
+                                    );
+                                }
+                              }
+                            },
                           ),
                         ),
+
+
                         Padding(
                           padding: EdgeInsets.all(20),
                           child:
@@ -391,9 +400,10 @@ class _MyCalendarsState extends State<MyCalendars> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Padding(
+                                    /*Padding(
                                       padding: EdgeInsets.all(10),
-                                      child: Text(
+                                      child:
+                                      Text(
                                         message!,
                                         style: TextStyle(
                                           color: Colors.white,
@@ -403,10 +413,10 @@ class _MyCalendarsState extends State<MyCalendars> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(height: 8),
+                                    SizedBox(height: 8),*/
                                     Container(
                                       height: 1,
-                                      color: Colors.white,
+                                      color: Colors.transparent,
 
                                     ),
                                     SizedBox(height: 8),
@@ -425,7 +435,7 @@ class _MyCalendarsState extends State<MyCalendars> {
                                     SizedBox(height: 8),
                                     Container(
                                       height: 1,
-                                      color: Colors.white,
+                                      color: Colors.transparent,
                                     ),
                                     SizedBox(height: 10),
                                     Padding(
@@ -443,8 +453,7 @@ class _MyCalendarsState extends State<MyCalendars> {
                                     SizedBox(height: 8),
                                     Container(
                                       height: 1,
-                                      color: Colors.white,
-
+                                      color: Colors.transparent,
                                     ),
                                   ],
                                 ),
@@ -460,6 +469,28 @@ class _MyCalendarsState extends State<MyCalendars> {
         ));
   }
 
+  bool _isSpecialDate(DateTime date) {
+    bool status = false;
+    for (int i = 0; i < manufacturerList.length; i++) {
+      DateTime date22 = DateTime(
+        int.parse(manufacturerList[i].year!),
+        int.parse(manufacturerList[i].month!),
+        int.parse(manufacturerList[i].day!),
+      );
+      if (date.day == date22.day) {
+        if (manufacturerList[i].reminderAvailabilityData==null || manufacturerList[i].reminderAvailabilityData!.isEmpty) {
+          status = false;
+          break;
+        } else {
+          status = true;
+          break;
+        }
+      }
+    }
+    return status;
+  }
+
+
 }
 
 class ProcedureApiService {
@@ -474,16 +505,15 @@ class ProcedureApiService {
       'month':month,
       'year':year,
     };
-    http.Response response =
-    await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response;
+
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
     if (response.statusCode == 200) {
       return routeModelFromJson(response.body);
     } else {
       throw Exception('Failed to load album');
     }
   }
-
-
-
 
 }

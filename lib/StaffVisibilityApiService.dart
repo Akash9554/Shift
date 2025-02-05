@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:shift/url_constants.dart';
 
@@ -19,8 +20,10 @@ class ProcedureApiService {
       'month':month,
       'year':year,
     };
-    http.Response response =
-        await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=  await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
     // print("Route Model Data is :........");
     // print(response.body);
     if (response.statusCode == 200) {

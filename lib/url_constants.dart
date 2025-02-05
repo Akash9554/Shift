@@ -19,9 +19,18 @@ class AppUrls {
   static const setstaffAvailability = "setstaffAvailability";
   static const setstaffAvailabilityOtherData = "setstaffAvailabilityOtherData";
   static const staff_recall_offload_shift = "staff_recall_offload_shift";
+  static const cancel_offload = "cancel_offload";
   static const staff_offload_shift = "staff_offload_shift";
+  static const save_notice_reply = "save_notice_reply";
+  static const notice_board_reminder = "notice_board_reminder";
   static const getManufacturerList = "getManufacturerList";
   static const getProcedureList = "getProcedureList";
   static const getbuyALaser = "buyALaser";
+  static const update_device_token = "update_device_token";
+  static const get_notice_board = "get_notice_board";
+  static const get_user_list="get_user_list";
+
+
+
 
 }

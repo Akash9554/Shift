@@ -12,9 +12,6 @@ import 'Signup.dart';
 import 'input_fields.dart';
 import 'login_controller.dart';
 
-
-
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -64,15 +61,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Center(
                           child: Form(
                             key: _globalKey,
+
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 CustomTextField(
-                                    controller: emailController,
-                                    hintText: 'Username,Email or Member Number',
+                                           controller: emailController,
+                                    hintText: 'Email',
                                     error: emailError,
                                     onUseridValueChange: (value) {
-
                                     }),
                                 const SizedBox(
                                   height: 20,

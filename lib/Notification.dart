@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
@@ -211,6 +212,8 @@ class _NotificationListState extends State<NotificationList> {
                                     fontFamily: 'Poppins_normal',
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14,
+
+
                                     color: Colors.white,
                                   ),),
                               ),
@@ -262,8 +265,10 @@ class ProcedureApiService {
     Map body = {
       'user_id': userid,
     };
-    http.Response response =
-    await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
     // print("Route Model Data is :........");
     // print(response.body);
     if (response.statusCode == 200) {

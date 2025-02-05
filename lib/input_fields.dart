@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/services/text_formatter.dart';
 
 class CustomTextField extends StatelessWidget {
   TextEditingController controller;
@@ -9,7 +8,6 @@ class CustomTextField extends StatelessWidget {
   final Function onUseridValueChange;
   CustomTextField({
     Key? key,
-
     required this.controller,
     required this.hintText,
     required this.error,
@@ -21,7 +19,6 @@ class CustomTextField extends StatelessWidget {
       height: 46,
       child:
       TextFormField(
-
         style:const TextStyle(
             decoration: TextDecoration.none,
             color: Color(0xFF142247),
