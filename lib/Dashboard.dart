@@ -72,7 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (isIOS) {
       devicetypes = "2";
     }
-    Updatetoken.fetchRouteData(user_id, devicetypes, token!);
+    //Updatetoken.fetchRouteData(user_id, devicetypes, token!);
   }
   Future<String> getAccessToken() async {
     // Your client ID and client secret obtained from Google Cloud Console
