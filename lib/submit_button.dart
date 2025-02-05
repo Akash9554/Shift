@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class SubmitButton extends StatelessWidget {
   final VoidCallback handleButtonClick;
-  // final Function handleButtonClick;
   final String title;
   const SubmitButton(
       {Key? key, required this.handleButtonClick, required this.title})

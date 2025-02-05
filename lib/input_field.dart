@@ -25,7 +25,6 @@ class CustomTextFields extends StatelessWidget {
             color: Color.fromARGB(255, 235, 235, 235),
             fontFamily: "Poppins_normal",
             fontSize: 14,
-
             fontWeight: FontWeight.w500),
         controller: controller,
         textInputAction: TextInputAction.next,

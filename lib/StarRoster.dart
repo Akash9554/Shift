@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'dart:convert';
 
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shift/url_constants.dart';
 import 'SideMenu.dart';
-import 'login.dart';
 import 'model/StaffshiftRosterListResponce.dart';
 
 class StarRoster extends StatefulWidget {
@@ -40,11 +38,14 @@ class _StarRosterState extends State<StarRoster> {
   String? dateSelection = '';
   int indexnum=0;
 
+  int current_days=0;
 
   @override
   void initState() {
     super.initState();
     indexnum=0;
+    DateTime now2 = DateTime.now();
+    current_days=now2.day;
     DateTime now = DateTime.now();
     firstDayOfMonth = DateTime(now.year, now.month, 1);
     lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
@@ -66,7 +67,7 @@ class _StarRosterState extends State<StarRoster> {
       indexnum=indexno;
       _selectedDate = dd;
       _scrollController.animateTo(
-        indexno * 60, // replace `itemWidth` with your item's width
+        indexno * 60, // replace itemWidth with your item's width
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -112,15 +113,22 @@ class _StarRosterState extends State<StarRoster> {
     }
     setState(() {
       manufacturerList.clear();
+
       manufacturerList = manufacturerListResponse.data!;
       for (int i = 0; i < manufacturerList.length; i++) {
-        if (i == 0) {
-          DateTime date22 = DateTime(currentyear, currentmonth,
-              int.parse(manufacturerList[i].day.toString()));
+        DateTime date22 = DateTime(currentyear, currentmonth, int.parse(manufacturerList[i].day.toString()));
+        if (date22.day == current_days) {
+          indexnum=i;
+          _scrollController.animateTo(
+            indexnum * 60, // replace itemWidth with your item's width
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
           _selectedDate = date22;
           DateFormat formatter2 = DateFormat('dd MMM yyyy');
           String newDateString2 = formatter2.format(_selectedDate!);
           dateSelection = newDateString2;
+          break;
         }
       }
     });
@@ -211,7 +219,7 @@ class _StarRosterState extends State<StarRoster> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Star Roaster',
+                            'Star Roster',
                             style: TextStyle(
                               fontFamily: 'Poppins_normal',
                               fontWeight: FontWeight.w500,
@@ -244,103 +252,103 @@ class _StarRosterState extends State<StarRoster> {
                 ),
               ],
             ),
-             SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      color: Colors.transparent,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                             children: _daysOfMonth
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                            int index = entry.key;
-                            DateTime date = entry.value;
-                            bool isSelected = _selectedDate != null
-                                ? date == _selectedDate
-                                : false;
-                            return GestureDetector(
-                              onTap: () {
-                                updateManufacturerList(index);
-                              },
-                              child: Container(
-                                width: 60,
-                                decoration: BoxDecoration(
+            SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    color: Colors.transparent,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _daysOfMonth
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          int index = entry.key;
+                          DateTime date = entry.value;
+                          bool isSelected = _selectedDate != null
+                              ? date == _selectedDate
+                              : false;
+                          return GestureDetector(
+                            onTap: () {
+                              updateManufacturerList(index);
+                            },
+                            child: Container(
+                              width: 60,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Color(0xFF142247)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
                                   color: isSelected
                                       ? Color(0xFF142247)
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? Color(0xFF142247)
-                                        : Colors.transparent,
-                                    width: 4,
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        DateFormat.MMM().format(date),
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins_normal',
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 14,
-                                          color: isSelected
-                                              ? Colors.white
-                                              : Color(0xFF142247),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        '${date.day}',
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins_normal',
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 14,
-                                          color: isSelected
-                                              ? Colors.white
-                                              : Color(0xFF142247),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(5),
-                                      child: Text(
-                                        DateFormat.E().format(date),
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins_normal',
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 14,
-                                          color: isSelected
-                                              ? Colors.white
-                                              : Color(0xFF142247),
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ],
+                                  width: 4,
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
+                              child: Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                      DateFormat.MMM().format(date),
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins_normal',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Color(0xFF142247),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                      '${date.day}',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins_normal',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Color(0xFF142247),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(5),
+                                    child: Text(
+                                      DateFormat.E().format(date),
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins_normal',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Color(0xFF142247),
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
               child: ListView.builder(
@@ -352,82 +360,82 @@ class _StarRosterState extends State<StarRoster> {
                       width: 60,
                       decoration:
                       BoxDecoration(color: Color(0xFF142247),
-                      borderRadius: BorderRadius.circular(4),
-                  border: Border.all(
-                  color:Color(0xFF142247),
-                  width: 4,
-                  ),
-                  ),
-                  child:Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(10),
-                        child: ListView.builder(
-                          padding: EdgeInsets.all(10),
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: location.locationData!.length,
-                          itemBuilder: (context, index) {
-                            final locationTime =
-                            location.locationData![index];
-                            return Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Container(// Make width match parent
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFB8B423), // Set the color to #B8B423
-                                    borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
-                                  ),
-                                  child:Container(
-                                    width: double.infinity, // Set the desired width// Set the desired height
-                                    child: Text(
-                                      locationTime.name!,
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins_normal',
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                ListView.builder(
-                                    padding: EdgeInsets.fromLTRB(0,10.0,0,10.0),
-                                    shrinkWrap: true,
-                                    physics:
-                                    NeverScrollableScrollPhysics(),
-                                    itemCount: locationTime.locationTimes!.length,
-                                    itemBuilder: (context, index) {
-                                      final locationTimea = locationTime.locationTimes![index];
-                                      return Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                      Container(
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color:Color(0xFF142247),
+                          width: 4,
+                        ),
+                      ),
+                      child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: ListView.builder(
+                              padding: EdgeInsets.all(10),
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: location.locationData!.length,
+                              itemBuilder: (context, index) {
+                                final locationTime =
+                                location.locationData![index];
+                                return Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Container(// Make width match parent
                                       padding: EdgeInsets.all(10),
                                       decoration: BoxDecoration(
-                                      color: Color(0xFFB0B0B0), // Set the color to #B8B423
-                                      borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
+                                        color: Color(0xFFB8B423), // Set the color to #B8B423
+                                        borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
                                       ),
-                                      child:
-                                      Container(
-                                      width: double.infinity, // Set the desired width
-                                      child:
-                                      Text(locationTimea.time!,
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                            ),
+                                      child:Container(
+                                        width: double.infinity, // Set the desired width// Set the desired height
+                                        child: Text(
+                                          locationTime.name!,
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins_normal',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Colors.white,
                                           ),
+                                        ),
                                       ),
-                                      ),
+                                    ),
+                                    ListView.builder(
+                                      padding: EdgeInsets.fromLTRB(0,10.0,0,10.0),
+                                      shrinkWrap: true,
+                                      physics:
+                                      NeverScrollableScrollPhysics(),
+                                      itemCount: locationTime.locationTimes!.length,
+                                      itemBuilder: (context, index) {
+                                        final locationTimea = locationTime.locationTimes![index];
+                                        return Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFB0B0B0), // Set the color to #B8B423
+                                                borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
+                                              ),
+                                              child:
+                                              Container(
+                                                width: double.infinity, // Set the desired width
+                                                child:
+                                                Text(locationTimea.time!,
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins_normal',
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 14,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
                                             ListView.builder(
-                                      padding: EdgeInsets.fromLTRB(0,1.0,0,1.0),
+                                              padding: EdgeInsets.fromLTRB(0,1.0,0,1.0),
                                               shrinkWrap: true,
                                               physics:
                                               NeverScrollableScrollPhysics(), itemCount: locationTimea.data!.length,
@@ -440,43 +448,43 @@ class _StarRosterState extends State<StarRoster> {
                                                   crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                                   children: [
-                                                Container(
-                                                padding: EdgeInsets.all(10),
-                                                decoration: BoxDecoration(
-                                                color: color, // Set the color to #B8B423
-                                                borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
-                                                ),
-                                                  margin: EdgeInsets.all(1),
-                                                 child:
-                                                Container(
-                                                width: double.infinity, // Set the desired width
-                                                child: Text(
-                                                      person.name!,
-                                                      style: TextStyle(
-                                                        fontFamily: 'Poppins_normal',
-                                                        fontWeight:
-                                                        FontWeight
-                                                            .bold,
+                                                    Container(
+                                                      padding: EdgeInsets.all(10),
+                                                      decoration: BoxDecoration(
+                                                        color: color, // Set the color to #B8B423
+                                                        borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
+                                                      ),
+                                                      margin: EdgeInsets.all(1),
+                                                      child:
+                                                      Container(
+                                                        width: double.infinity, // Set the desired width
+                                                        child: Text(
+                                                          person.name!,
+                                                          style: TextStyle(
+                                                            fontFamily: 'Poppins_normal',
+                                                            fontWeight:
+                                                            FontWeight
+                                                                .bold,
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                ),
-                                                ),
                                                   ],
                                                 );
                                               },
                                             ),
 
-                                        ],
-                                      );
-                                    },
-                                  ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ));
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ));
                 },
               ),
             ),
@@ -500,8 +508,10 @@ class ProcedureApiService {
       'month':month,
       'year':year,
     };
-    http.Response response =
-    await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
     if (response.statusCode == 200) {
       return routeModelFromJson(response.body);
     } else {
@@ -513,4 +523,3 @@ class ProcedureApiService {
 
 
 }
-

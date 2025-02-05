@@ -43,28 +43,8 @@ class MyPage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            if (offload == 1)
-              ElevatedButton(
-                onPressed: () {
-                  // Add your onPressed logic here
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF066E95),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'You want to grab this shift',
-                  style: TextStyle(
-                    fontFamily: 'Poppins_normal',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            SizedBox(height: 20),
+
+            SizedBox(height: 10),
             HtmlWidget(data),
           ],
         ),

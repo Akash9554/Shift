@@ -98,6 +98,7 @@ class UpcommingShift {
   int? offloadShiftCheck;
   int? recallOffloadedShift;
   int? cancelOffloadedShift;
+  UserDetail? userDetail;
 
   UpcommingShift(
       {this.id,
@@ -127,7 +128,8 @@ class UpcommingShift {
         this.availableMsg,
         this.offloadShiftCheck,
         this.recallOffloadedShift,
-        this.cancelOffloadedShift});
+        this.cancelOffloadedShift,
+        this.userDetail});
 
   UpcommingShift.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -158,6 +160,9 @@ class UpcommingShift {
     offloadShiftCheck = json['offload_shift_check'];
     recallOffloadedShift = json['recall_offloaded_shift'];
     cancelOffloadedShift = json['cancel_offloaded_shift'];
+    userDetail = json['user_detail'] != null
+        ? new UserDetail.fromJson(json['user_detail'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -190,50 +195,97 @@ class UpcommingShift {
     data['offload_shift_check'] = this.offloadShiftCheck;
     data['recall_offloaded_shift'] = this.recallOffloadedShift;
     data['cancel_offloaded_shift'] = this.cancelOffloadedShift;
+    if (this.userDetail != null) {
+      data['user_detail'] = this.userDetail!.toJson();
+    }
     return data;
   }
 }
 
 class ShiftOffload {
+  String? id;
+  String? reminderId;
+  List<UserDetail>? userDetail;
   String? shiftDate;
   String? offloadDate;
   String? subject;
-  String? mailData;
   int? offloadShiftGrab;
   String? msg;
-  String? id;
+  String? mailData;
+  String? locationName;
+  String? platformName;
+  String? startTime;
+  String? endTime;
+  String? stateId;
+  String? status;
+  String? offloadReminderStatus;
 
   ShiftOffload(
-      {this.shiftDate,
+      {this.id,
+        this.reminderId,
+        this.userDetail,
+        this.shiftDate,
         this.offloadDate,
         this.subject,
-        this.mailData,
         this.offloadShiftGrab,
         this.msg,
-      this.id});
+        this.mailData,
+        this.locationName,
+        this.platformName,
+        this.startTime,
+        this.endTime,
+        this.stateId,
+        this.status,
+        this.offloadReminderStatus});
 
   ShiftOffload.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    reminderId = json['reminder_id'];
+    if (json['user_detail'] != null) {
+      userDetail = <UserDetail>[];
+      json['user_detail'].forEach((v) {
+        userDetail!.add(new UserDetail.fromJson(v));
+      });
+    }
     shiftDate = json['shift_date'];
     offloadDate = json['offload_date'];
     subject = json['subject'];
-    mailData = json['mail_data'];
     offloadShiftGrab = json['offload_shift_grab'];
     msg = json['msg'];
-    id = json['id'];
+    mailData = json['mail_data'];
+    locationName = json['location_name'];
+    platformName = json['platform_name'];
+    startTime = json['start_time'];
+    endTime = json['end_time'];
+    stateId = json['state_id'];
+    status = json['status'];
+    offloadReminderStatus = json['offload_reminder_status'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['reminder_id'] = this.reminderId;
+    if (this.userDetail != null) {
+      data['user_detail'] = this.userDetail!.map((v) => v.toJson()).toList();
+    }
     data['shift_date'] = this.shiftDate;
     data['offload_date'] = this.offloadDate;
     data['subject'] = this.subject;
-    data['mail_data'] = this.mailData;
     data['offload_shift_grab'] = this.offloadShiftGrab;
     data['msg'] = this.msg;
-    data['id'] = this.id;
+    data['mail_data'] = this.mailData;
+    data['location_name'] = this.locationName;
+    data['platform_name'] = this.platformName;
+    data['start_time'] = this.startTime;
+    data['end_time'] = this.endTime;
+    data['state_id'] = this.stateId;
+    data['status'] = this.status;
+    data['offload_reminder_status'] = this.offloadReminderStatus;
     return data;
   }
 }
+
 
 class RecentCommunications {
   String? id;
@@ -260,6 +312,27 @@ class RecentCommunications {
     data['subject'] = this.subject;
     data['message'] = this.message;
     data['created_at'] = this.createdAt;
+    return data;
+  }
+}
+class UserDetail {
+  String? name;
+  String? surname;
+  String? email;
+
+  UserDetail({this.name, this.surname, this.email});
+
+  UserDetail.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    surname = json['surname'];
+    email = json['email'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['name'] = this.name;
+    data['surname'] = this.surname;
+    data['email'] = this.email;
     return data;
   }
 }

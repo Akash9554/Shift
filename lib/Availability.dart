@@ -1,12 +1,17 @@
+
+
+
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:shift/url_constants.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'Notify.dart';
 import 'SideMenu.dart';
@@ -26,7 +31,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
   late Future<StaffAvailability> fetchdata;
 
   TextEditingController _textControllernotes = TextEditingController();
-  ScrollController _scrollController = ScrollController();
   final getStorge=GetStorage();
   late List<DateTime> _daysOfMonth;
   DateTime? _selectedDate;
@@ -38,8 +42,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
   List<int> _numberListsec = List.generate(201, (index) => index - 100);
 
   String _selectedValuess = 'Select FS';
-  List<String> _options = ['Select FS', 'Yes', 'No'];
-
+  List<String> _options = [ 'Yes', 'No',''];
   List<StaffData> manufacturerList = [];
 
   String cutOffDateText = 'Cut off Date for May is Wednesday, 19 April';
@@ -51,10 +54,11 @@ class _MonthCalendarState extends State<MonthCalendar> {
   String? dateSelection='';
   bool _isAvalabilityChecked = true;
   bool _isNightAvalabilityChecked = true;
+  bool _isAfterNoonAvalabilityChecked = true;
+  String _isAfterNoonAvalabilityCheckedStatus="1";
   String _isAvalabilityCheckedStatus="1";
   String _isNightAvalabilityCheckedstatus="1";
   bool loopFinished = false;
-
   String user_id=GetStorage().read("id");
 
 
@@ -64,6 +68,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
   int currentday=0;
   int currentmonth=0;
   int currentyear=0;
+  late final DateTime? lastday;
 
   @override
   void initState() {
@@ -75,6 +80,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
     currentyear = firstDayOfMonth.year;
     currentmonth = firstDayOfMonth.month;
     currentday = firstDayOfMonth.day;
+    lastday=lastDayOfMonth;
     _daysOfMonth = [];
     _daysOfMonth.clear();
     getupdateddatafirst('$currentmonth','$currentyear');
@@ -104,6 +110,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
     }
     if (loopFinished) {
       setState(() {
+        _daysOfMonth.clear();
         _daysOfMonth.addAll(_daysOfMonthss);
       });
     }
@@ -124,6 +131,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
         if (!(manufacturerListResponse.calenderOtherDetail?.note==null)){
           notes=manufacturerListResponse.calenderOtherDetail?.note;
           _textControllernotes.text=notes!;
+        }else{
+          _textControllernotes.text="";
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.erp==null)){
@@ -135,12 +144,11 @@ class _MonthCalendarState extends State<MonthCalendar> {
               break;
             }
           }
+        }else{
+          _selectedValueerp = 0;
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.max==null)){
-          // int max= Integer.parseInt(response.body().getCalenderOtherDetail().getMax());
-          //spinner_max.setSelection(valuesErp.indexOf(max));
-
           String maxString = manufacturerListResponse.calenderOtherDetail?.max ?? '0';
           int mx = int.tryParse(maxString) ?? 0;
           for (int i = 0; i < _numberListsec.length; i++) {
@@ -150,6 +158,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
             }
           }
 
+        }else{
+          _selectedValuemx = 0;
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.samfs==null)){
@@ -166,7 +176,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
       }
       manufacturerList.clear();
       manufacturerList = manufacturerListResponse.data!;
-      List<StaffData> dates = [];
       cutOffDateText=manufacturerListResponse.calendeMsg!;
       for (int i = 0; i < manufacturerList.length; i++) {
         if(i==0){
@@ -193,8 +202,15 @@ class _MonthCalendarState extends State<MonthCalendar> {
             }else {
               _isNightAvalabilityChecked=true;
             }
+            String ? afternoon = manufacturerList[i].datedata?[0].afternoonUnavailable;
+            if(afternoon=="1"){
+              _isAfterNoonAvalabilityChecked=false;
+            }else {
+              _isAfterNoonAvalabilityChecked=true;
+            }
           }else{
             _isAvalabilityChecked=false;
+            _isAfterNoonAvalabilityChecked=false;
             _isNightAvalabilityChecked=false;
           }
         }
@@ -206,19 +222,12 @@ class _MonthCalendarState extends State<MonthCalendar> {
     DateTime dd = DateTime(int.parse(manufacturerList![indexno].year!), int.parse(manufacturerList![indexno].month!), manufacturerList![indexno].date!);
     setState(() {
       _selectedDate=dd;
-      _scrollController.animateTo(
-        indexno * 60, // replace `itemWidth` with your item's width
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
       currentyear=dd.year;
       currentmonth=dd.month;
       currentday=dd.day;
       DateFormat formatter2 = DateFormat('dd MMM yyyy');
       String newDateString2 = formatter2.format(dd);
       dateSelection=newDateString2;
-
-
       if (!(manufacturerList[indexno].message==null)){
         message=manufacturerList[indexno].message;
       }else{
@@ -237,8 +246,15 @@ class _MonthCalendarState extends State<MonthCalendar> {
         }else {
           _isNightAvalabilityChecked=true;
         }
+        String ? afternoon = manufacturerList[indexno].datedata?[0].afternoonUnavailable;
+        if(afternoon=="1"){
+          _isAfterNoonAvalabilityChecked=false;
+        }else {
+          _isAfterNoonAvalabilityChecked=true;
+        }
       }else{
         _isAvalabilityChecked=false;
+        _isAfterNoonAvalabilityChecked=false;
         _isNightAvalabilityChecked=false;
       }
     });
@@ -268,6 +284,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
         currentday=firstDayOfMonths.day;
         currentmonth=firstDayOfMonths.month;
         currentyear=firstDayOfMonths.year;
+        lastday=lastDayOfMonths;
         _selectedDate = picked;
         _generateDaysOfMonth(firstDayOfMonths,lastDayOfMonths);
         getupdateddatafirst('$currentmonth','$currentyear');
@@ -328,8 +345,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
-                       child: Padding(
-                               padding: EdgeInsets.only(top: 16, left: 16),
+                       child: Padding(padding: EdgeInsets.only(top: 16, left: 16),
                         child: Text(
                           cutOffDateText,
                           style: TextStyle(
@@ -362,94 +378,86 @@ class _MonthCalendarState extends State<MonthCalendar> {
                   ],
                 ),
                 Expanded(
-
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          color: Colors.transparent,
-                          child: SingleChildScrollView(
-                            controller: _scrollController,
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: _daysOfMonth.asMap().entries.map((entry){
-                                int index = entry.key;
-                                DateTime date = entry.value;
-                                bool isSelected = _selectedDate != null ? date == _selectedDate : false;
-                                return GestureDetector(
-                                  onTap: () {
-
-                                    updateManufacturerList(index);
-                                  },
-                                  child:Container(
-                                    width: 60,
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? Color(0xFF142247) : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(
-                                        color: isSelected ? Color(0xFF142247) : Colors.transparent,
-                                        width: 4,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            DateFormat.MMM().format(date),
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected ? Colors.white : Color(0xFF142247),
-                                            ),
-
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            '${date.day}',
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected ? Colors.white : Color(0xFF142247),
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.all(5),
-                                          child: Text(
-                                            DateFormat.E().format(date),
-                                            style: TextStyle(
-                                              fontFamily: 'Poppins_normal',
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: isSelected ? Colors.white : Color(0xFF142247),
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                        TableCalendar(
+                          calendarFormat: CalendarFormat.month,
+                          selectedDayPredicate: (date) {
+                            return _selectedDate != null ? isSameDay(date, _selectedDate) : false;
+                          },
+                          onDaySelected: (selectedDate, focusedDay) {
+                            setState(() {
+                              _selectedDate = selectedDate;
+                            });
+                            updateManufacturerList(_daysOfMonth.indexOf(selectedDate));
+                          },
+                          headerVisible: false,
+                          availableCalendarFormats: const {
+                            CalendarFormat.month: 'Month',
+                          },
+                          daysOfWeekStyle: DaysOfWeekStyle(
+                            weekdayStyle: TextStyle(
+                              fontFamily: 'Poppins_normal',
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                              color: Color(0xFF142247),
+                            ),
+                            weekendStyle: TextStyle(
+                              fontFamily: 'Poppins_normal',
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                              color: Color(0xFF142247),
                             ),
                           ),
-                        ),
+                          headerStyle: HeaderStyle(
+                            titleTextStyle: TextStyle(
+                              fontFamily: 'Poppins_normal',
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Color(0xFF142247),
+                            ),
+                          ),
+                          calendarStyle: CalendarStyle(
+                            selectedDecoration: BoxDecoration(
+                              color: Color(0xFF142247),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            selectedTextStyle: TextStyle(
+                              fontFamily: 'Poppins_normal',
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                          focusedDay: _daysOfMonth.first,
+                          firstDay: _daysOfMonth.first,
+                          lastDay: _daysOfMonth.last,
+                        calendarBuilders: CalendarBuilders(
+                            defaultBuilder: (context, date, events) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${date.day}',
+                                  style: TextStyle(
+                                    color: Color(0xFF142247),
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins_normal',
+                                  ),
+                                ),
+                              );
+                        }),),
                         Center(
                           child: Padding(
                             padding: EdgeInsets.all(25),
                             child: MaterialButton(
                               onPressed: () {
-                                makeentireMonthUnavailable(user_id,'$currentmonth','$currentyear',entire_month_unavailable);
+                                makeentireMonthUnavailable(user_id, '$currentmonth', '$currentyear', entire_month_unavailable);
                               },
                               child: Text(
                                 resetbtntext,
@@ -469,11 +477,9 @@ class _MonthCalendarState extends State<MonthCalendar> {
                         ),
                         Padding(
                           padding: EdgeInsets.all(20),
-                          child:
-                          SingleChildScrollView(
+                          child: SingleChildScrollView(
                             child: Center(
-                              child:
-                              Container(
+                              child: Container(
                                 padding: EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   color: Color(0xFF066E95),
@@ -498,7 +504,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                     Container(
                                       height: 1,
                                       color: Colors.white,
-
                                     ),
                                     SizedBox(height: 8),
                                     Padding(
@@ -519,13 +524,11 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                       color: Colors.white,
                                     ),
                                     SizedBox(height: 10),
-
                                     Theme(
                                       data: ThemeData(
                                         unselectedWidgetColor: Colors.transparent,
                                       ),
-                                      child:
-                                      CheckboxListTile(
+                                      child: CheckboxListTile(
                                         title: Text(
                                           'Day unavailable',
                                           style: TextStyle(
@@ -558,8 +561,40 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                       data: ThemeData(
                                         unselectedWidgetColor: Colors.transparent,
                                       ),
-                                      child:
-                                      CheckboxListTile(
+                                      child: CheckboxListTile(
+                                        title: Text(
+                                          'Afternoon unavailable',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins_normal',
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        value: _isAfterNoonAvalabilityChecked,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _isAfterNoonAvalabilityChecked = value!;
+                                          });
+                                        },
+                                        controlAffinity: ListTileControlAffinity.trailing,
+                                        activeColor: Colors.transparent,
+                                        checkColor: Colors.transparent,
+                                        secondary: _isAfterNoonAvalabilityChecked
+                                            ? Icon(
+                                          Icons.check_box,
+                                          color: Colors.white,
+                                        )
+                                            : Icon(
+                                          Icons.check_box_outline_blank,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                    Theme(
+                                      data: ThemeData(
+                                        unselectedWidgetColor: Colors.transparent,
+                                      ),
+                                      child: CheckboxListTile(
                                         title: Text(
                                           'Night unavailable',
                                           style: TextStyle(
@@ -588,7 +623,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                         ),
                                       ),
                                     ),
-
                                     SizedBox(height: 16),
                                     ElevatedButton(
                                       onPressed: () {
@@ -606,7 +640,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        primary: Color(0xFF73CDEF),
+                                        backgroundColor: Color(0xFF73CDEF),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(16),
                                         ),
@@ -616,10 +650,9 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                   ],
                                 ),
                               ),
-                            ),),
+                            ),
+                          ),
                         ),
-
-
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
@@ -743,7 +776,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                     ),
                                   ),
                                   SizedBox(height: 10),
-                                  Container(
+                                 /* Container(
                                     width: double.infinity,
                                     child: Expanded(
                                       child: DropdownButtonFormField(
@@ -768,7 +801,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                       ),
                                     ),
                                   ),
-
+*/
                                 ],
                               ),
                             ),
@@ -806,25 +839,20 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                     ),
                                   ),
                                 ),
+
                                 SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () {
-                                    if(_selectedValuess=="Select FS"){
+                                    if(_selectedValuess=="No"){
                                       setstaffAvailabilityOtherData(
                                           user_id, '$currentmonth', '$currentyear', '$_selectedValueerp',
-                                          '$_selectedValuemx',"",_textControllernotes.text);
-                                    }else {
-                                      if(_selectedValuess=="No"){
-                                        setstaffAvailabilityOtherData(
-                                            user_id, '$currentmonth', '$currentyear', '$_selectedValueerp',
-                                            '$_selectedValuemx',"0",_textControllernotes.text);
-                                      }else{
-                                        setstaffAvailabilityOtherData(
-                                            user_id, '$currentmonth', '$currentyear', '$_selectedValueerp',
-                                            '$_selectedValuemx',"1",_textControllernotes.text);
-                                      }
-
-                                    }},
+                                          '$_selectedValuemx',"0",_textControllernotes.text);
+                                    }else{
+                                      setstaffAvailabilityOtherData(
+                                          user_id, '$currentmonth', '$currentyear', '$_selectedValueerp',
+                                          '$_selectedValuemx',"1",_textControllernotes.text);
+                                    }
+                                  },
                                   child: Padding(
                                     padding: EdgeInsets.all(10),
                                     child: Text(
@@ -838,7 +866,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                     ),
                                   ),
                                   style: ElevatedButton.styleFrom(
-                                    primary: Color(0xFF142247),
+                                    backgroundColor: Color(0xFF142247),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(16),
                                     ),
@@ -851,11 +879,9 @@ class _MonthCalendarState extends State<MonthCalendar> {
                         ),
                       ],
                     ),
-
-
                   ),
-
                 ),
+
               ]
           ),
         ));
@@ -900,6 +926,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
         if (!(manufacturerListResponse.calenderOtherDetail?.note==null)){
           notes=manufacturerListResponse.calenderOtherDetail?.note;
           _textControllernotes.text=notes!;
+        }else{
+          _textControllernotes.text="";
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.erp==null)){
@@ -911,6 +939,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
               break;
             }
           }
+        }else{
+          _selectedValueerp = 0;
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.max==null)){
@@ -922,6 +952,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
               break;
             }
           }
+        }else{
+          _selectedValuemx = 0;
         }
 
         if (!(manufacturerListResponse.calenderOtherDetail?.samfs==null)){
@@ -944,11 +976,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
         DateTime date22=DateTime(int.parse(manufacturerList[i].year!), int.parse(manufacturerList[i].month!), manufacturerList[i].date!);
         if(_selectedDate==date22){
           _selectedDate=date22;
-          _scrollController.animateTo(
-            i * 60, // replace `itemWidth` with your item's width
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
           if (!(manufacturerList[i].message==null)){
             message=manufacturerList[i].message;
           }
@@ -974,9 +1001,16 @@ class _MonthCalendarState extends State<MonthCalendar> {
             }else {
               _isNightAvalabilityChecked=true;
             }
+            String ? afternoon = manufacturerList[i].datedata?[0].afternoonUnavailable;
+            if(afternoon=="0"){
+              _isAfterNoonAvalabilityChecked=false;
+            }else {
+              _isAfterNoonAvalabilityChecked=true;
+            }
           }else{
             _isAvalabilityChecked=false;
             _isNightAvalabilityChecked=false;
+            _isAfterNoonAvalabilityChecked=false;
           }
 
         }
@@ -995,6 +1029,8 @@ class _MonthCalendarState extends State<MonthCalendar> {
     } else {
       _isAvalabilityCheckedStatus = "0";
     }
+
+
     if (_isNightAvalabilityChecked) {
       _isNightAvalabilityCheckedstatus = "1";
     } else {
@@ -1027,9 +1063,10 @@ class _MonthCalendarState extends State<MonthCalendar> {
         'available_unavailable': available,
       };
 
-      http.Response response =
-      await http.post(url, body: jsonEncode(body), headers: headers);
-
+      http.Response response;
+      EasyLoading.show(status: 'loading...');
+      response=await http.post(url, body: jsonEncode(body), headers: headers);
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['errorCode'] == "0") {
@@ -1060,8 +1097,10 @@ class _MonthCalendarState extends State<MonthCalendar> {
         'entire_month_unavailable': entire_month_unavailable,
       };
 
-      http.Response response =
-      await http.post(url, body: jsonEncode(body), headers: headers);
+      http.Response response;
+      EasyLoading.show(status: 'loading...');
+      response=await http.post(url, body: jsonEncode(body), headers: headers);
+      EasyLoading.dismiss();
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -1097,9 +1136,10 @@ class _MonthCalendarState extends State<MonthCalendar> {
         'note': notes,
       };
 
-      http.Response response =
-      await http.post(url, body: jsonEncode(body), headers: headers);
-
+      http.Response response;
+      EasyLoading.show(status: 'loading...');
+      response=await http.post(url, body: jsonEncode(body), headers: headers);
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         //Notify.snackbar("Success", "Login Successfully !");

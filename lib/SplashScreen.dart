@@ -1,17 +1,11 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:shift/SideMenu.dart';
 import 'dart:async';
-
-import 'Availability.dart';
-import 'Home.dart';
-import 'MyCalender.dart';
-import 'Notification.dart';
-import 'Profile.dart';
-import 'SideBar.dart';
-import 'Signup.dart';
-import 'StarRoster.dart';
+import 'Dashboard.dart';
 import 'login.dart';
+import 'dart:io';
+
 
 
 class SplashScreen extends StatefulWidget {
@@ -22,32 +16,83 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  String _deviceToken = "";
+  String devicetypes="";
   final getstorage=GetStorage();
+
+
+
   @override
   void initState() {
     super.initState();
+    _firebaseMessaging.requestPermission();
+    _firebaseMessaging.getToken().then((token) {
+      print("FCM Token: $token");
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // Handle the foreground notification
+      print("Foreground Notification: ${message.notification?.body}");
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      // Handle the notification when the app is in the background or terminated
+      print("Background/terminated Notification: ${message.notification?.body}");
+    });
+   // _getDeviceToken();
     Future.delayed(Duration(milliseconds: 3000), () {
       checkLoggedInUser();
+    }
+    );
+  }
+
+  Future<void> _getDeviceToken() async {
+    String? token = await _firebaseMessaging.getToken();
+    setState(() {
+      _deviceToken = token!;
+      print(_deviceToken);
+    });
+  }
+  void initializeFirebaseMessaging() {
+    _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+
     });
 
   }
-
   void checkLoggedInUser() {
     if (getstorage.read("id") == null) {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
     } else {
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => SideMenu()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+   // initializeFirebaseMessaging();
+    bool isAndroid = Platform.isAndroid;
+    bool isIOS = Platform.isIOS;
+    if(isAndroid){
+      devicetypes="1";
+    }else if(isIOS){
+      devicetypes="2";
+    }
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Stack(
+
           children: [
             Image.asset(
               'assets/images/back.png', // Background image
@@ -65,7 +110,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 50,
               ),
             ),
-
             Positioned(
               top: 250,
               left: 0,

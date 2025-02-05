@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "828943617222",
+    "project_id": "star-staff-rostering",
+    "storage_bucket": "star-staff-rostering.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828943617222:android:0fc74ef3466a2258e71bc7",
+        "android_client_info": {
+          "package_name": "com.app.starstaffrostering"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828943617222-ur6bc76uv40lpl5uk9sj1ide4j9f2978.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.starstaffrostering",
+            "certificate_hash": "f35092dffd5f727631bfa90d195ddab9af43951f"
+          }
+        },
+        {
+          "client_id": "828943617222-9c3avr2gkeve7gbi78hv64ls8dl17osn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0e5F1bctpAvoSV-KUeWEoowBLPE-VM1g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828943617222-9c3avr2gkeve7gbi78hv64ls8dl17osn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "828943617222-pma2ujk196cng574n93iag5ki5di1mks.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.star.staff"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

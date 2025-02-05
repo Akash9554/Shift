@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'Availability.dart';
+import 'Availabilitynew.dart';
 import 'SideMenu.dart';
 
 class MyApp extends StatefulWidget {
@@ -9,12 +10,8 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 
 }
-
 class _MyAppState extends State<MyApp> {
-
   DateTime? _selectedDate;
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(
@@ -23,7 +20,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('My App'),
         ),
-        body: MonthCalendar(),
+        body: MonthCalendars(),
         drawer: SideMenu(),
                         ),
     );

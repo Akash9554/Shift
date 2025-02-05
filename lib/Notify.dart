@@ -6,7 +6,7 @@ class Notify {
     Get.snackbar(
       title,
       msg,
-      icon: Image.asset("assets/image/mainlogo.png"),
+      icon: Image.asset("assets/images/shiftlogo.png"),
       backgroundColor: Colors.black54,
       snackPosition: SnackPosition.BOTTOM,
       borderRadius: 10,

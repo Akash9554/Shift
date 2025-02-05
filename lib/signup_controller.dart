@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shift/url_constants.dart';
-
-import 'Availability.dart';
 import 'LoginModel.dart';
 import 'Notify.dart';
 import 'SideBar.dart';
@@ -54,8 +53,10 @@ class SignUpController extends GetxController {
         'qualification_id': qualification_id,
       };
 
-      http.Response response = await http.post(url, body: jsonEncode(body), headers: headers);
-
+      http.Response response;
+      EasyLoading.show(status: 'loading...');
+      response= await http.post(url, body: jsonEncode(body), headers: headers);
+      EasyLoading.dismiss();
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['errorCode'] == "0") {
