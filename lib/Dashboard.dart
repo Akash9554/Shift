@@ -76,19 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
   Future<String> getAccessToken() async {
     // Your client ID and client secret obtained from Google Cloud Console
-    /*final serviceAccountJson = {
-      "type": "service_account",
-      "project_id": "star-staff-rostering",
-      "private_key_id": "445177fb5e2e2670f719d02aa942af979470cdd1",
-      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCtTtoQsAviNwpl\niWdkLhqxaYpgfZqzSCggqAHlXlangStFyUfpQiAbDFluk5dcrB1lmlGwagQrmXce\n0pF5b7hq/f9hrdjAc6xfEJXeWJUaA4iy+R6H3nr8MQHu63m23Mtw+VggieW5aWct\n9fLgO8d5LmskulRXd+fRaTZkzFwqagViDnA16Jv0FN/gwC2rWhYuOL4mnN5Mss1b\nlZ+dfBw6ezL9GLvvbQUXECQQE/EbNvZEdWa6pOfje0qyCEtRqq2sOmLoVXa98umX\nnzXkQd1wKSxlYc+QAHMzg2Ma2byIF8WwMgDzH95gRLboXVODnTR0MPjqxZOasv94\n/DCuULC/AgMBAAECggEAPqqYBFe7/FDdtAhit+FJ6qPYkvpoAXLSe7h0cw1RNSFq\nVcIp/Ajalh05i1fX7/0WZiJOboVvO5qy7ZTDYI9Ktnlgql/T1AcfqYJURsFuLKlh\neSHGbee/Pci0w8Em0j31XET1HlLum8QmuIJKD9Xd04461N2BWN11GA48ymbw3q6+\nISeTqXavVRyHEGYsHwB4Oostz413JPbzhYFedlyKeRjza8LpDlNejEZ8C+sK2AB+\nIpoW6iAFTJXB+IfEAui4vqC/bqZaVoZwbY4yTsMLBxXv41eUd5YMZQuRF5424bcw\nj/8POi0fpHIQu0PxP4g+A4K3BDeqtzyGeKWD2Q7hlQKBgQDYMekC4jpz4xgwfJfS\nt9iTNP4TjELfWUURQXpLgs3jpLYNJI5D9w5NL7UezmAjNxpOmKeXtGiQVQWQSE+j\nIiX3aug17/mVXQlVfEf04MVkIfTyTBqZixyAHz6qYH/s6I424RlFfHF52YICa8Sh\n5RiUiyu1J15VZw17Pjgo4HYkjQKBgQDNN4RTk/FMXFPVxOIzlXScTPZ/Kuw8rzUw\nAYgQksECSd1nx1QSriqKxfrYSnqL5AWZqgpoLz0RDlv9ZfAR0xeg9B/DfK9gJUni\n4Y4ffMxWBaWvFb75JLRfw/HGp/uSk8GOg+m7bx2ORI2eNo3wgLPONVs00Br979Ag\nQ4QkgwflewKBgBX/HgIZGnFoDbIBO0FJS1PO9Hrwrm0jHA/hZZwBNwmOXKeBrKfl\nnyLjU75KqSVsGdUdWw/oXyswO1yuvsuOUeaWjgHO5Mn5qVV1S6zyoaLKga2VaK9u\no/u1Mh8LqnhkQPP8eyHCw5juNHgiluMR+CpE7rGDy+lMjuaXMgeWru6RAoGBAKNF\n3mRYuozUkGbuBEKiUGri2OOIlPgbNigBr+3vtNxLRHqDHqLWK0bKCa/4YdPXEZWW\nsjz+CIn/cLUFW6Hy30PRt0vjcez+/fAjIN5wfmqah53roUu8Jj5jOYOitweBw2fO\nEDJuT4eXh00vfnKxE12nGe/E+xS6rk5dKU+baLbtAoGBAJGFU/YXf1H4b4RxKvUN\niMEnTyq0Z7//IZw7iEWlbanIfaWApmN7Y6oTe4HqOaXr/+MWaSGAKuVzo5qoDccA\nJJ4T/Mjg7jcUG+Sy/nv1MWVVQ2WbrxtlX55txEfHjuj00EsbWNYtOBX0y2RQuXD9\nm3jiAnVDTGuukGmBdE7jcn8U\n-----END PRIVATE KEY-----\n",
-      "client_email": "firebase-adminsdk-t7ru9@star-staff-rostering.iam.gserviceaccount.com",
-      "client_id": "105132505600400332663",
-      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-      "token_uri": "https://oauth2.googleapis.com/token",
-      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-t7ru9%40star-staff-rostering.iam.gserviceaccount.com",
-      "universe_domain": "googleapis.com"
-    };*/
+
 
     List<String> scopes = [
       "https://www.googleapis.com/auth/userinfo.email",
