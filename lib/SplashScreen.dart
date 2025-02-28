@@ -18,7 +18,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   String _deviceToken = "";
   String devicetypes="";
   final getstorage=GetStorage();
@@ -28,49 +27,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _firebaseMessaging.requestPermission();
-    _firebaseMessaging.getToken().then((token) {
-      print("FCM Token: $token");
-    });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // Handle the foreground notification
-      print("Foreground Notification: ${message.notification?.body}");
-    });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // Handle the notification when the app is in the background or terminated
-      print("Background/terminated Notification: ${message.notification?.body}");
-    });
-   // _getDeviceToken();
     Future.delayed(Duration(milliseconds: 3000), () {
       checkLoggedInUser();
     }
     );
-  }
-
-  Future<void> _getDeviceToken() async {
-    String? token = await _firebaseMessaging.getToken();
-    setState(() {
-      _deviceToken = token!;
-      print(_deviceToken);
-    });
-  }
-  void initializeFirebaseMessaging() {
-    _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
-      if (message != null) {
-
-      }
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-
-    });
-
   }
   void checkLoggedInUser() {
     if (getstorage.read("id") == null) {

@@ -3,25 +3,21 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+
 import 'package:shift/openurl.dart';
 import 'package:shift/url_constants.dart';
 import 'package:http/http.dart' as http;
-import 'input_fields.dart';
-
-import 'Notification.dart';
-import 'PDFViewerPage.dart';
 import 'SideMenu.dart';
 import 'ViewPage.dart';
+
 import 'Notify.dart';
 import 'model/Get_notice_board.dart';
 import 'model/StaffshiftDashboardResponce.dart';
-import 'package:googleapis_auth/auth_io.dart' as auth;
-import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -46,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String user_id="";
 
   late String _deviceToken = "";
-
+  String UUID="";
   void incrementCounter() {
       getupdateddatafirst(user_id);
   }
@@ -55,21 +51,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
    user_id=GetStorage().read("id");
+    fetchUserId();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getnoticeboard(user_id,this.context);
     });
-
-    //_onclickdeletee(context);
     getupdateddatafirst(user_id);
-    _getDeviceToken();
+   // _getDeviceToken();
 
   }
+
+  Future<void> fetchUserId() async {
+    String? userId = await getOneSignalUserId();
+    setState(() {
+      UUID = userId!;
+      _getDeviceToken();
+    });
+  }
+
+  Future<String?> getOneSignalUserId() async {
+    return await OneSignal.User.pushSubscription.id;
+  }
+
+
+
+  Future<String?> getFCMToken() async {
+    String? token;
+    await FirebaseMessaging.instance.getToken().then((token1) async {
+      token = token1;
+    }).catchError((exception, stackTrace) async {});
+
+    return token;
+  }
+
+
   Future<void> _getDeviceToken() async {
 
     user_id = GetStorage().read("id") ?? ""; // Ensure null safety
-    _deviceToken = await getAccessToken(); // Fixed incorrect assignment
-    String? token = await FirebaseMessaging.instance.getToken(vapidKey: _deviceToken);
+   // final String? token = await getFCMToken();// Fixed incorrect assignment
     bool isAndroid = Platform.isAndroid;
     bool isIOS = Platform.isIOS;
     if (isAndroid) {
@@ -77,39 +96,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } else if (isIOS) {
       devicetypes = "2";
     }
-    Updatetoken.fetchRouteData(user_id, devicetypes, token!);
+    Updatetoken.fetchRouteData(user_id, devicetypes, UUID!);
   }
-  Future<String> getAccessToken() async {
-    // Your client ID and client secret obtained from Google Cloud Console
-    final serviceAccountJson = {
 
-    };
 
-    List<String> scopes = [
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/firebase.database",
-      "https://www.googleapis.com/auth/firebase.messaging"
-    ];
-
-    http.Client client = await auth.clientViaServiceAccount(
-      auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
-      scopes,
-    );
-
-    // Obtain the access token
-    auth.AccessCredentials credentials = await auth.obtainAccessCredentialsViaServiceAccount(
-        auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
-        scopes,
-        client
-    );
-
-    // Close the HTTP client
-    client.close();
-
-    // Return the access token
-    return credentials.accessToken.data;
-
-  }
 
 
   void grabStaffOffloadShiftGrab( String id) {
@@ -1022,68 +1012,67 @@ class Getnoticeboardlist {
 class Savereply {
   static var client = http.Client();
 
-  static Future<StaffshiftDashboardResponce> fetchRouteData(BuildContext context,String userid,String reply,String notice_id) async {
+  static Future<StaffshiftDashboardResponce> fetchRouteData(
+      BuildContext context, String userid, String reply, String notice_id) async {
     var headers = {'Content-Type': 'application/json'};
-    var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.save_notice_reply);
+    var url = Uri.parse(AppUrls.baseUrl + AppUrls.save_notice_reply);
     Map body = {
       'user_id': userid,
-      'reply':reply,
-      'notice_id':notice_id,
-
+      'reply': reply,
+      'notice_id': notice_id,
     };
-    // Call the provided function to show loading indicator
-    http.Response response ;
 
     EasyLoading.show(status: 'loading...');
-    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response = await http.post(url, body: jsonEncode(body), headers: headers);
     EasyLoading.dismiss();
+
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
-        Navigator.of(context).pop();
-      }else{
-        Notify.snackbar(json['errorMsg'],"");
+        // Close all dialogs
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } else {
+        Notify.snackbar(json['errorMsg'], "");
       }
       return routeModelFromJson(response.body);
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load data');
     }
   }
-
 }
+
 
 class NoticeBoardReminder {
   static var client = http.Client();
 
-  static Future<StaffshiftDashboardResponce> fetchRouteData(BuildContext context,String userid,String notice_board_reminder) async {
+  static Future<StaffshiftDashboardResponce> fetchRouteData(
+      BuildContext context, String userid, String notice_board_reminder) async {
     var headers = {'Content-Type': 'application/json'};
-    var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.notice_board_reminder);
+    var url = Uri.parse(AppUrls.baseUrl + AppUrls.notice_board_reminder);
     Map body = {
       'user_id': userid,
-      'notice_board_reminder':notice_board_reminder,
+      'notice_board_reminder': notice_board_reminder,
     };
-    // Call the provided function to show loading indicator
-    http.Response response ;
 
     EasyLoading.show(status: 'loading...');
-    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    http.Response response = await http.post(url, body: jsonEncode(body), headers: headers);
     EasyLoading.dismiss();
+
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
-        Navigator.of(context).pop();
-      }else{
-        Notify.snackbar(json['errorMsg'],"");
+        // Close all dialogs
+        Navigator.popUntil(context, (route) => route.isFirst);
+      } else {
+        Notify.snackbar(json['errorMsg'], "");
       }
       return routeModelFromJson(response.body);
     } else {
-      throw Exception('Failed to load album');
+      throw Exception('Failed to load data');
     }
   }
-
 }
+
 
 
 
