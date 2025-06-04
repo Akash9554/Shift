@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 
-StaffshiftGrablistResponce routeModelFromJson(String str) => StaffshiftGrablistResponce.fromJson(json.decode(str));
+StaffshiftGrablistResponce routeModelFromJsons(String str) => StaffshiftGrablistResponce.fromJson(json.decode(str));
 
 String routeModelToJson(StaffshiftGrablistResponce data) => json.encode(data.toJson());
 

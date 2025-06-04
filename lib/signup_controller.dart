@@ -9,6 +9,7 @@ import 'package:shift/url_constants.dart';
 import 'LoginModel.dart';
 import 'Notify.dart';
 import 'SideBar.dart';
+import 'login.dart';
 
 class SignUpController extends GetxController {
   static login(BuildContext context, String first_name, String last_name, String mobile_no, String email, String password,
@@ -68,10 +69,10 @@ class SignUpController extends GetxController {
           String? mobile_no = loginModel.data![0].mobileNo;
           String? email = loginModel.data![0].email;
           Notify.snackbar("Success", json['errorMsg']);
-          getStorge.write("id", id);
+
           getStorge.write("name", first_name! + " " + last_name!);
           getStorge.write("email", email);
-          Get.to(MySideMenu());
+          Get.to(LoginScreen());
         } else if (json['errorCode'] == "1") {
           Notify.snackbar("Failed", "" + json['errorMsg']);
         }

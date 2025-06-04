@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -8,17 +7,17 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-
 import 'package:shift/openurl.dart';
 import 'package:shift/url_constants.dart';
 import 'package:http/http.dart' as http;
 import 'SideMenu.dart';
 import 'ViewPage.dart';
-
 import 'Notify.dart';
 import 'model/Get_notice_board.dart';
 import 'model/StaffshiftDashboardResponce.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'model/StaffshiftGrablistResponce.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -73,8 +72,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return await OneSignal.User.pushSubscription.id;
   }
 
-
-
   Future<String?> getFCMToken() async {
     String? token;
     await FirebaseMessaging.instance.getToken().then((token1) async {
@@ -84,11 +81,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return token;
   }
 
-
   Future<void> _getDeviceToken() async {
 
     user_id = GetStorage().read("id") ?? ""; // Ensure null safety
-   // final String? token = await getFCMToken();// Fixed incorrect assignment
     bool isAndroid = Platform.isAndroid;
     bool isIOS = Platform.isIOS;
     if (isAndroid) {
@@ -98,9 +93,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
     Updatetoken.fetchRouteData(user_id, devicetypes, UUID!);
   }
-
-
-
 
   void grabStaffOffloadShiftGrab( String id) {
     fetchdata = OffloadShiftApi.fetchRouteData(user_id, id);
@@ -116,21 +108,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-
-  void recallbutton( String id) {
-    fetchdata=RecallApi.fetchRouteData(user_id, id);
+  void readvertise_offload( String id,String mail_id) {
+    fetchdata=RecallApi3.fetchRouteData(user_id, id,mail_id);
     fetchdata.then((response) {
       incrementCounter();
     });
   }
 
-  void cancelbtn( String id,String mail_id) {
-    fetchdata=CancelApi.fetchRouteData(user_id, id,mail_id);
+  Future<void> cancelbtn(String id) async {
+    fetchdata=CancelApi.fetchRouteData(user_id, id);
     fetchdata.then((response) {
       incrementCounter();
     });
   }
-
 
   void staff_offload_shift( String id) {
     fetchdata = OffloadApi.fetchRouteData(user_id, id);
@@ -188,7 +178,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     });
   }
-
 
   Future<void> fetchDataa() async {
     StaffshiftDashboardResponce manufacturerListResponse = await fetchdata;
@@ -410,31 +399,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),),
-                                )
-                              else if (shift.offloadShiftCheck == 2)
-                                ElevatedButton(
-                                  onPressed: () {
-                                    recallbutton(shift.id!,
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFE36307),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Text('Shift Offload Pending', style: TextStyle(
-                                    fontFamily: 'Poppins_normal',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),),
                                 ),
+
                               if (shift.offloadShiftCheck == 2)
                   ElevatedButton(
                   onPressed: () {
                   cancelbtn(
-                  shift.reminderId!,shift.id!
+                  shift.id!
                   );
                   },
                   style: ElevatedButton.styleFrom(
@@ -540,11 +511,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           SizedBox(height: 5),
-                          /*Container(
-                            // Set the desired height
-                            color:Colors.white,// Set the desired width
-                            child: HtmlWidget(shiftoffload[index].mailData!),
-                          ),*/
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -567,30 +533,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),),
                               ),
                               SizedBox(height: 10),
-                              if(shiftoffload[index].offloadReminderStatus!="")
-                                ElevatedButton(
-                                  onPressed: () {
-                                   // cancelbtn(shiftoffload[index].id!);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFE36307),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Text('Shift Allocation Pending',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins_normal',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),),),
+
                               if(shiftoffload[index].offloadReminderStatus!="")
                                 SizedBox(height: 10),
                               if(shiftoffload[index].offloadReminderStatus!="")
                                 ElevatedButton(
                                   onPressed: () {
-                                     cancelbtn(shiftoffload[index].reminderId!,shiftoffload[index].id!);
+                                     cancelbtn(shiftoffload[index].id!);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFFE36307),
@@ -742,7 +691,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-
   _onclickdeletee(BuildContext context,String user_id) async {
     try {
       showDialog(
@@ -816,8 +764,6 @@ class ProcedureApiService {
     EasyLoading.show(status: 'loading...');
     response=await http.post(url, body: jsonEncode(body), headers: headers);
     EasyLoading.dismiss();
-    // print("Route Model Data is :........");
-    // print(response.body);
     if (response.statusCode == 200) {
       return routeModelFromJson(response.body);
     } else {
@@ -841,8 +787,6 @@ class OffloadShiftApi {
     EasyLoading.show(status: 'loading...');
     response=await http.post(url, body: jsonEncode(body), headers: headers);
     EasyLoading.dismiss();
-    // print("Route Model Data is :........");
-    // print(response.body);
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
@@ -921,18 +865,18 @@ class RecallApi {
   }
 }
 
-class CancelApi {
+class RecallApi2 {
   static var client = http.Client();
 
-  static Future<StaffshiftDashboardResponce> fetchRouteData(
-      String userid,String id,String mail_id) async {
+  static Future<StaffshiftGrablistResponce> fetchRouteData(
+      String userid,String id,String mail_data_id) async {
     var headers = {'Content-Type': 'application/json'};
     var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.cancel_offload);
+    Uri.parse(AppUrls.baseUrl + AppUrls.staff_recall_offload_shift);
     Map body = {
       'user_id': userid,
       'reminder_id':id,
-      'mail_id':mail_id,
+      'mail_data_id':mail_data_id,
     };
     http.Response response;
     EasyLoading.show(status: 'loading...');
@@ -942,6 +886,70 @@ class CancelApi {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
         ProcedureApiService.fetchRouteData(userid);
+      }else{
+        Notify.snackbar(json['errorMsg'],"");
+      }
+      return routeModelFromJsons(response.body);
+    } else {
+      throw Exception('Failed to load album');
+    }
+  }
+}
+
+class RecallApi3 {
+  static var client = http.Client();
+
+  static Future<StaffshiftDashboardResponce> fetchRouteData(
+      String userid,String id,String mail_data_id) async {
+    var headers = {'Content-Type': 'application/json'};
+    var url =
+    Uri.parse(AppUrls.baseUrl + AppUrls.staff_recall_offload_shift);
+    Map body = {
+      'user_id': userid,
+      'reminder_id':id,
+      'mail_data_id':mail_data_id,
+    };
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['errorCode'] == "0") {
+        ProcedureApiService.fetchRouteData(userid);
+      }else{
+        Notify.snackbar(json['errorMsg'],"");
+      }
+      return routeModelFromJson(response.body);
+    } else {
+      throw Exception('Failed to load album');
+    }
+  }
+}
+
+
+
+class CancelApi {
+  static var client = http.Client();
+
+  static Future<StaffshiftDashboardResponce> fetchRouteData(
+      String userid,String id) async {
+    var headers = {'Content-Type': 'application/json'};
+    var url =
+    Uri.parse(AppUrls.baseUrl + AppUrls.readvertise_offload);
+    Map body = {
+      'user_id': userid,
+      'reminder_id':id
+    };
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['errorCode'] == "0") {
+
+       // ProcedureApiService.fetchRouteData(userid);
       }else{
         Notify.snackbar(json['errorMsg'],"");
       }
@@ -1008,7 +1016,6 @@ class Getnoticeboardlist {
     }
   }
 }
-
 class Savereply {
   static var client = http.Client();
 
@@ -1030,7 +1037,7 @@ class Savereply {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
         // Close all dialogs
-        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
       } else {
         Notify.snackbar(json['errorMsg'], "");
       }
@@ -1040,7 +1047,6 @@ class Savereply {
     }
   }
 }
-
 
 class NoticeBoardReminder {
   static var client = http.Client();
@@ -1062,7 +1068,7 @@ class NoticeBoardReminder {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
         // Close all dialogs
-        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DashboardScreen()));
       } else {
         Notify.snackbar(json['errorMsg'], "");
       }
@@ -1072,11 +1078,6 @@ class NoticeBoardReminder {
     }
   }
 }
-
-
-
-
-
 class NoticeItem extends StatelessWidget {
   final String title;
   final String message;
@@ -1236,14 +1237,6 @@ class Updatetoken {
     };
     http.Response response;
     response=await http.post(url, body: jsonEncode(body), headers: headers);
-
-    // print("Route Model Data is :........");
-    // print(response.body);
-    //  if (response.statusCode == 200) {
-    //  Notify.snackbar("Grab Success", "");
-    //  return routeModelFromJson(response.body);
-    // } else {
-    // throw Exception('Failed to load album');
     return '';
   }
 }

@@ -7,6 +7,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:shift/url_constants.dart';
 import 'package:http/http.dart' as http;
+import 'Dashboard.dart';
 import 'SideMenu.dart';
 import 'ViewPage.dart';
 import 'Notify.dart';
@@ -31,10 +32,16 @@ class _GrabListState extends State<GrabList> {
     getUpdatedDataFirst(user_id);
   }
 
-  void cancelbtn(  String id,String mail_id) {
-    fetchdata=CancelApi.fetchRouteData(user_id, id,mail_id);
+  void cancelbtn(  String id) {
+    fetchdata=CancelApi.fetchRouteData(user_id, id);
     getUpdatedDataFirst(user_id);
   }
+
+  void readvertise_offload( String id,mail_id) {
+    fetchdata=RecallApi2.fetchRouteData(user_id, id,mail_id);
+    getUpdatedDataFirst(user_id);
+  }
+
 
   void grabStaffOffloadShiftGrab( String id) {
     fetchdata = OffloadShiftApi.fetchRouteData(user_id, id);
@@ -281,31 +288,13 @@ class _GrabListState extends State<GrabList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(height: 10),
-                                  if(shiftoffload[index].offloadReminderStatus!="")
-                                    ElevatedButton(
-                                      onPressed: () {
-                                       // cancelbtn( shiftoffload[index].userId!, shiftoffload[index].id!);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFFE36307),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: Text('Shift Allocation Pending',
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins_normal',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),),),
 
                                   if(shiftoffload[index].offloadReminderStatus!="")
                                     SizedBox(height: 10),
                                   if(shiftoffload[index].offloadReminderStatus!="")
                                     ElevatedButton(
                                       onPressed: () {
-                                        cancelbtn(shiftoffload[index].reminderId!,shiftoffload[index].id!);
+                                        cancelbtn(shiftoffload[index].id!);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xFFE36307),
@@ -460,6 +449,7 @@ class _GrabListState extends State<GrabList> {
     ),
             ],
           ),
+
         ),
       ),
     );
@@ -490,7 +480,7 @@ class ProcedureApiService {
       }else{
         Notify.snackbar(json['errorMsg'],"");
       }
-      return routeModelFromJson(response.body);
+      return routeModelFromJsons(response.body);
     } else {
       throw Exception('Failed to load album');
     }
@@ -501,14 +491,13 @@ class CancelApi {
   static var client = http.Client();
 
   static Future<StaffshiftGrablistResponce> fetchRouteData(
-      String userid,String id,String mail_id) async {
+      String userid,String id) async {
     var headers = {'Content-Type': 'application/json'};
     var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.cancel_offload);
+    Uri.parse(AppUrls.baseUrl + AppUrls.readvertise_offload);
     Map body = {
       'user_id': userid,
       'reminder_id':id,
-      'mail_id':mail_id,
     };
     http.Response response;
     EasyLoading.show(status: 'loading...');
@@ -517,12 +506,13 @@ class CancelApi {
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body);
       if (json['errorCode'] == "0") {
-
+        Notify.snackbar(json['errorMsg'],"");
+        ProcedureApiService.fetchRouteData(userid);
       }else{
         Notify.snackbar(json['errorMsg'],"");
       }
       //  ProcedureApiService.fetchRouteData(userid);
-      return routeModelFromJson(response.body);
+      return routeModelFromJsons(response.body);
     } else {
       throw Exception('Failed to load album');
     }
@@ -557,7 +547,7 @@ class OffloadShiftApi {
       }else{
         Notify.snackbar(json['errorMsg'],"");
       }
-      return routeModelFromJson(response.body);
+      return routeModelFromJsons(response.body);
     } else {
       throw Exception('Failed to load album');
     }
