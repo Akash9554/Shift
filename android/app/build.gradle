@@ -6,14 +6,15 @@ plugins {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
     namespace "com.app.starstaffrostering"
 
     defaultConfig {
         applicationId "com.app.starstaffrostering"
         minSdk 23
-        targetSdk 34
-        versionCode 13
+        //noinspection EditedTargetSdkVersion
+        targetSdk 35
+        versionCode 15
         versionName "1.0.0"
         multiDexEnabled true
     }
