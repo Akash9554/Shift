@@ -355,119 +355,137 @@ class _StarRosterState extends State<StarRoster> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 itemCount: 1,
                 itemBuilder: (context, index) {
                   final location = manufacturerList[indexnum];
                   return Container(
-                      width: 60,
-                      decoration:
-                      BoxDecoration(color: Color(0xFF142247),
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color:Color(0xFF142247),
-                          width: 4,
-                        ),
-                      ),
-                      child:Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                            child: ListView.builder(
-                              padding: EdgeInsets.all(10),
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: location.locationData!.length,
-                              itemBuilder: (context, index) {
-                                final locationTime =
-                                location.locationData![index];
-                                return Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    Container(// Make width match parent
-                                      padding: EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFB8B423), // Set the color to #B8B423
-                                        borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
-                                      ),
-                                      child:Container(
-                                        width: double.infinity, // Set the desired width// Set the desired height
-                                        child: Text(
-                                          locationTime.name!,
-                                          style: TextStyle(
-                                            fontFamily: 'Poppins_normal',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                          ),
+                    width: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF142247),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: const Color(0xFF142247), width: 4),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(10),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: location.locationData!.length,
+                            itemBuilder: (context, index) {
+                              final locationTime = location.locationData![index];
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFB8B423),
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Container(
+                                      width: double.infinity,
+                                      child: Text(
+                                        locationTime.name ?? '',
+                                        style: const TextStyle(
+                                          fontFamily: 'Poppins_normal',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
+                                  ),
+                                  if (locationTime.locationTimes != null)
                                     ListView.builder(
-                                      padding: EdgeInsets.fromLTRB(0,10.0,0,10.0),
+                                      padding: const EdgeInsets.symmetric(vertical: 10.0),
                                       shrinkWrap: true,
-                                      physics:
-                                      NeverScrollableScrollPhysics(),
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemCount: locationTime.locationTimes!.length,
                                       itemBuilder: (context, index) {
                                         final locationTimea = locationTime.locationTimes![index];
+                                        final bool isPrimary = locationTimea.data != null && locationTimea.data!.isNotEmpty;
+                                        final List<dynamic> displayList = isPrimary
+                                            ? locationTimea.data!
+                                            : (locationTimea.otherTimings ?? []);
+
                                         return Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Container(
-                                              padding: EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFB0B0B0), // Set the color to #B8B423
-                                                borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
-                                              ),
-                                              child:
+                                            if (isPrimary)
                                               Container(
-                                                width: double.infinity, // Set the desired width
-                                                child:
-                                                Text(locationTimea.time!,
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins_normal',
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 14,
-                                                    color: Colors.white,
+                                                padding: const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFB0B0B0),
+                                                  borderRadius: BorderRadius.circular(5.0),
+                                                ),
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  child: Text(
+                                                    locationTimea.time ?? '',
+                                                    style: const TextStyle(
+                                                      fontFamily: 'Poppins_normal',
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 14,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
                                             ListView.builder(
-                                              padding: EdgeInsets.fromLTRB(0,1.0,0,1.0),
+                                              padding: const EdgeInsets.symmetric(vertical: 4.0),
                                               shrinkWrap: true,
-                                              physics:
-                                              NeverScrollableScrollPhysics(), itemCount: locationTimea.data!.length,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              itemCount: displayList.length,
                                               itemBuilder: (context, index) {
-                                                final person = locationTimea.data![index];
-                                                String colorCode = person.colorCode!; // Assuming person.colorCode is a string representing the color code
-                                                colorCode = colorCode.replaceAll('#', '');
-                                                Color color = Color(int.parse('0xFF$colorCode'));
+                                                final person = displayList[index];
+                                                final String colorCode = (person.colorCode ?? 'B8B423').replaceAll('#', '');
+                                                final Color color = Color(int.parse('0xFF$colorCode'));
+
                                                 return Column(
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Container(
-                                                      padding: EdgeInsets.all(10),
-                                                      decoration: BoxDecoration(
-                                                        color: color, // Set the color to #B8B423
-                                                        borderRadius: BorderRadius.circular(5.0), // Adjust the border radius as needed
-                                                      ),
-                                                      margin: EdgeInsets.all(1),
-                                                      child:
+                                                    if (!isPrimary)
                                                       Container(
-                                                        width: double.infinity, // Set the desired width
+                                                        padding: const EdgeInsets.all(10),
+                                                        decoration: BoxDecoration(
+                                                          color: Color(
+                                                              0xFFB0B0B0),
+                                                          borderRadius: BorderRadius.circular(5.0),
+                                                        ),
+                                                        margin: const EdgeInsets.all(1),
+                                                        child: Container(
+                                                          width: double.infinity,
+                                                          child: Text(
+                                                            person.time ?? '',
+                                                            style: const TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 14,
+                                                              fontFamily: 'Poppins_normal',
+                                                              fontWeight: FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    Container(
+                                                      padding: const EdgeInsets.all(10),
+                                                      decoration: BoxDecoration(
+                                                        color: color,
+                                                        borderRadius: BorderRadius.circular(5.0),
+                                                      ),
+                                                      margin: const EdgeInsets.all(1),
+                                                      child: Container(
+                                                        width: double.infinity,
                                                         child: Text(
-                                                          person.name!,
-                                                          style: TextStyle(
+                                                          person.name ?? '',
+                                                          style: const TextStyle(
                                                             fontFamily: 'Poppins_normal',
-                                                            fontWeight:
-                                                            FontWeight
-                                                                .bold,
+                                                            fontWeight: FontWeight.bold,
                                                           ),
                                                         ),
                                                       ),
@@ -476,21 +494,23 @@ class _StarRosterState extends State<StarRoster> {
                                                 );
                                               },
                                             ),
-
                                           ],
                                         );
                                       },
                                     ),
-                                  ],
-                                );
-                              },
-                            ),
+
+                                ],
+                              );
+                            },
                           ),
-                        ],
-                      ));
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
-            ),
+            )
+
           ],
         ),
       ),
@@ -505,7 +525,7 @@ class ProcedureApiService {
   static Future<StaffshiftRosterListResponce> fetchRouteData(String userid,String month,String year) async {
     var headers = {'Content-Type': 'application/json'};
     var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.staff_star_roster);
+    Uri.parse(AppUrls.baseUrl + AppUrls.staff_star_roster_june_2025);
     Map body = {
       'user_id': userid,
       'month':month,

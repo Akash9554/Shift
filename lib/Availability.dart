@@ -1051,7 +1051,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
     try {
       var headers = {'Content-Type': 'application/json'};
       var url =
-      Uri.parse(AppUrls.baseUrl + AppUrls.setstaffAvailability);
+      Uri.parse(AppUrls.baseUrl + AppUrls.staff_star_roster_june_2025);
       Map body = {
         'user_id': user_id.toString(),
         'month': '$currentmonth',

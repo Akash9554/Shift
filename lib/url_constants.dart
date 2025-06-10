@@ -30,4 +30,5 @@ class AppUrls {
   static const get_notice_board = "get_notice_board";
   static const get_user_list="get_user_list";
   static const readvertise_offload="readvertise_offload";
+  static const staff_star_roster_june_2025="staff_star_roster_june_2025";
 }

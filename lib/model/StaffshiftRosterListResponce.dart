@@ -102,8 +102,9 @@ class LocationData {
 class LocationTimes {
   String? time;
   List<Data>? data;
+  List<OtherTimings>? otherTimings;
 
-  LocationTimes({this.time, this.data});
+  LocationTimes({this.time, this.data , this.otherTimings});
 
   LocationTimes.fromJson(Map<String, dynamic> json) {
     time = json['time'];
@@ -113,6 +114,13 @@ class LocationTimes {
         data!.add(new Data.fromJson(v));
       });
     }
+    if (json['other_timings'] != null) {
+      otherTimings = <OtherTimings>[];
+      json['other_timings'].forEach((v) {
+        otherTimings!.add(new OtherTimings.fromJson(v));
+      });
+    }
+
   }
 
   Map<String, dynamic> toJson() {
@@ -120,6 +128,10 @@ class LocationTimes {
     data['time'] = this.time;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    if (this.otherTimings != null) {
+      data['other_timings'] =
+          this.otherTimings!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -138,6 +150,28 @@ class Data {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['color_code'] = this.colorCode;
+    data['name'] = this.name;
+    return data;
+  }
+}
+
+class OtherTimings {
+  String? time;
+  String? colorCode;
+  String? name;
+
+  OtherTimings({this.time, this.colorCode, this.name});
+
+  OtherTimings.fromJson(Map<String, dynamic> json) {
+    time = json['time'];
+    colorCode = json['color_code'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['time'] = this.time;
     data['color_code'] = this.colorCode;
     data['name'] = this.name;
     return data;
@@ -180,3 +214,6 @@ class LocationList {
     return data;
   }
 }
+
+
+
