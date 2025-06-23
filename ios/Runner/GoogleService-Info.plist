@@ -6,6 +6,8 @@
 	<string>828943617222-pma2ujk196cng574n93iag5ki5di1mks.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
 	<string>com.googleusercontent.apps.828943617222-pma2ujk196cng574n93iag5ki5di1mks</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>828943617222-ur6bc76uv40lpl5uk9sj1ide4j9f2978.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDXbXkaj-GZ2EZ4Ar4aJi-9zylGR9DO_K0</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,7 +19,7 @@
 	<key>PROJECT_ID</key>
 	<string>star-staff-rostering</string>
 	<key>STORAGE_BUCKET</key>
-	<string>star-staff-rostering.appspot.com</string>
+	<string>star-staff-rostering.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
