@@ -153,10 +153,7 @@ class _MonthCalendarsState extends State<MonthCalendars> {
         setState(() {
           b = a;
           _selectedDate = date22;
-          DateFormat formatter2 = DateFormat('dd MMM yyyy');
-          dateSelection = formatter2.format(_selectedDate!);
           message = manufacturerList[b].message ?? '';
-
           var data = manufacturerList[b].datedata?.isNotEmpty == true ? manufacturerList[b].datedata![0] : null;
           _isAvalabilityChecked = data?.dayUnavailable == "0";
           daytext = _isAvalabilityChecked ? "Day available" : "Day Unavailable";

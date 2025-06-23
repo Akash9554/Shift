@@ -413,6 +413,8 @@ class _StarRosterState extends State<StarRoster> {
                                         final List<dynamic> displayList = isPrimary
                                             ? locationTimea.data!
                                             : (locationTimea.otherTimings ?? []);
+                                        Set<String> displayedTimes = {}; // Outside itemBuilder, e.g., above ListView.builder
+
 
                                         return Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,11 +448,17 @@ class _StarRosterState extends State<StarRoster> {
                                                 final person = displayList[index];
                                                 final String colorCode = (person.colorCode ?? 'B8B423').replaceAll('#', '');
                                                 final Color color = Color(int.parse('0xFF$colorCode'));
+                                                final bool shouldShowTime = !isPrimary &&
+                                                    person.time != null &&
+                                                    !displayedTimes.contains(person.time);
+                                                if (shouldShowTime) {
+                                                  displayedTimes.add(person.time!);
+                                                }
 
                                                 return Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    if (!isPrimary)
+                                                    if (shouldShowTime)
                                                       Container(
                                                         padding: const EdgeInsets.all(10),
                                                         decoration: BoxDecoration(
