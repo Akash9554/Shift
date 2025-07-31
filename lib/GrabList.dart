@@ -37,6 +37,11 @@ class _GrabListState extends State<GrabList> {
     getUpdatedDataFirst(user_id);
   }
 
+  Future<void> cancelofferbtn(String id) async {
+    final response = await CancelofferApi.fetchRouteData(user_id, id);
+    getUpdatedDataFirst(user_id); // once the cancel is done
+  }
+
   void readvertise_offload( String id,mail_id) {
     fetchdata=RecallApi2.fetchRouteData(user_id, id,mail_id);
     getUpdatedDataFirst(user_id);
@@ -289,12 +294,12 @@ class _GrabListState extends State<GrabList> {
                                 children: [
                                   SizedBox(height: 10),
 
-                                  if(shiftoffload[index].offloadReminderStatus!="")
+                                  if(shiftoffload[index].offloadReminderStatus=="3")
                                     SizedBox(height: 10),
-                                  if(shiftoffload[index].offloadReminderStatus!="")
+                                  if(shiftoffload[index].offloadReminderStatus=="3")
                                     ElevatedButton(
                                       onPressed: () {
-                                        cancelbtn(shiftoffload[index].id!);
+                                        cancelofferbtn(shiftoffload[index].id!);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xFFE36307),
@@ -302,16 +307,16 @@ class _GrabListState extends State<GrabList> {
                                           borderRadius: BorderRadius.circular(10),
                                         ),
                                       ),
-                                      child: Text('Cancel Offload',
+                                      child: Text('Cancel Offer to Grab',
                                         style: TextStyle(
                                           fontFamily: 'Poppins_normal',
                                           fontWeight: FontWeight.w500,
                                           fontSize: 14,
                                           color: Colors.white,
                                         ),),),
-                                  if(shiftoffload[index].offloadReminderStatus!="")
+                                  if(shiftoffload[index].offloadReminderStatus=="3")
                                     SizedBox(height: 10),
-                                  if(shiftoffload[index].offloadReminderStatus!="")
+                                  if(shiftoffload[index].offloadReminderStatus =="3")
                                     Text(
                                       'You have applied to pick up this shift. Shifts are allocated after 24 hours. You will be notified shortly.',
                                       style: TextStyle(

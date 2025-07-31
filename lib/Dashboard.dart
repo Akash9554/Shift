@@ -116,10 +116,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> cancelbtn(String id) async {
-    fetchdata=CancelApi.fetchRouteData(user_id, id);
-    fetchdata.then((response) {
-      incrementCounter();
-    });
+    final response = await CancelApi.fetchRouteData(user_id, id);
+    incrementCounter(); // once the cancel is done
+  }
+
+  Future<void> cancelofferbtn(String id) async {
+    final response = await CancelofferApi.fetchRouteData(user_id, id);
+    incrementCounter(); // once the cancel is done
   }
 
   void staff_offload_shift( String id) {
@@ -149,16 +152,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  void getupdateddatafirst(String userid){
-    late Future<StaffshiftDashboardResponce> fetchdatas;
-    fetchdatas = ProcedureApiService.fetchRouteData(user_id);
-
+  void getupdateddatafirst(String userid) {
     setState(() {
-      fetchdata=fetchdatas;
-      fetchDataa();
+      fetchdata = ProcedureApiService.fetchRouteData(userid);
     });
-
+    // if you need to do something after data is fetched, use `then` or `await`
+    fetchdata.then((value) {
+      fetchDataa(); // but only if this is not calling setState again
+    });
   }
+
 
   void getnoticeboard(String userid,BuildContext context){
     late Future<Get_notice_board_ListResponce> fetchdatas;
@@ -180,39 +183,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> fetchDataa() async {
-    StaffshiftDashboardResponce manufacturerListResponse = await fetchdata;
+    try {
+      final StaffshiftDashboardResponce manufacturerListResponse = await fetchdata;
 
-
-    if (manufacturerListResponse.upcommingShift != null) {
       setState(() {
-        upcommingshift = manufacturerListResponse.upcommingShift!;
+        // Set upcoming shift if available
+        if (manufacturerListResponse.upcommingShift != null) {
+          upcommingshift = manufacturerListResponse.upcommingShift!;
+        }
+
+        // Set shift offload if available
+        if (manufacturerListResponse.shiftOffload != null &&
+            manufacturerListResponse.shiftOffload!.isNotEmpty) {
+          shiftoffload.clear();
+          shiftoffload = manufacturerListResponse.shiftOffload!;
+        }
+
+        // Set recent communication if available
+        if (manufacturerListResponse.recentCommunications != null &&
+            manufacturerListResponse.recentCommunications!.isNotEmpty) {
+          recentcommunication.clear();
+          recentcommunication = manufacturerListResponse.recentCommunications!;
+        }
+
+        // Set total shift
+        totalShift = manufacturerListResponse.totalShift ?? 0;
       });
+    } catch (e) {
+      print('Error fetching data: $e');
+      // Optional: handle error state
     }
+  }
 
-      if (!(manufacturerListResponse.shiftOffload!.length== null)) {
-        shiftoffload.clear();
-        setState(() {
-
-
-          shiftoffload=manufacturerListResponse.shiftOffload!;
-        });
-      }
-
-      if (!(manufacturerListResponse.recentCommunications!.length==null)){
-        recentcommunication.clear();
-        setState(() {
-          recentcommunication=manufacturerListResponse.recentCommunications!;
-        });
-      }
-
-    if (!(manufacturerListResponse.totalShift==null)){
-
-      totalShift=manufacturerListResponse.totalShift!;
-    }else{
-      totalShift=0;
-    }
-
-    }
 
   @override
   Widget build(BuildContext context) {
@@ -401,11 +403,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),),
                                 ),
 
-                              if (shift.offloadShiftCheck == 2)
+                 if (shift.offloadShiftCheck == 2)
                   ElevatedButton(
                   onPressed: () {
                   cancelbtn(
-                  shift.id!
+                  shift.reminderId!
                   );
                   },
                   style: ElevatedButton.styleFrom(
@@ -414,7 +416,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(10),
                   ),
                   ),
-                  child: Text('Cancel Offload', style: TextStyle(
+                  child: Text('Cancel the offload', style: TextStyle(
                   fontFamily: 'Poppins_normal',
                   fontWeight: FontWeight.normal,
                   fontSize: 14,
@@ -422,18 +424,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),),
                   ),
                               SizedBox(height: 5),
-                              if (shift.offloadShiftCheck == 2)
-                                Text(
-                                  'Your shift is now up for grabs, you will be notified if it is successfully offloaded, until then the shift is still yours.',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins_normal',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
-                                  textAlign: TextAlign.start,
-                                ),
-
                             ],
                           ),
                         ],
@@ -534,12 +524,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                               SizedBox(height: 10),
 
-                              if(shiftoffload[index].offloadReminderStatus!="")
+                              if(shiftoffload[index].offloadReminderStatus=="3")
                                 SizedBox(height: 10),
-                              if(shiftoffload[index].offloadReminderStatus!="")
+                              if(shiftoffload[index].offloadReminderStatus=="3")
                                 ElevatedButton(
                                   onPressed: () {
-                                     cancelbtn(shiftoffload[index].id!);
+                                    cancelofferbtn(shiftoffload[index].id!);
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFFE36307),
@@ -547,17 +537,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  child: Text('Cancel Offload',
+                                  child: Text('Cancel Offer to Grab',
                                     style: TextStyle(
                                       fontFamily: 'Poppins_normal',
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),),),
-                              if(shiftoffload[index].offloadReminderStatus!="")
+                              if(shiftoffload[index].offloadReminderStatus==  "3")
                                 SizedBox(height: 10),
 
-                              if(shiftoffload[index].offloadReminderStatus!="")
+                              if(shiftoffload[index].offloadReminderStatus=="3")
                                 Text('You have applied to pick up this shift. Shifts are allocated after 24 hours. You will be notified shortly.',
                                   style: TextStyle(
                                     fontFamily: 'Poppins_normal',
@@ -936,7 +926,7 @@ class CancelApi {
       String userid,String id) async {
     var headers = {'Content-Type': 'application/json'};
     var url =
-    Uri.parse(AppUrls.baseUrl + AppUrls.readvertise_offload);
+    Uri.parse(AppUrls.baseUrl + AppUrls.cancel_offload);
     Map body = {
       'user_id': userid,
       'reminder_id':id
@@ -950,6 +940,37 @@ class CancelApi {
       if (json['errorCode'] == "0") {
 
        // ProcedureApiService.fetchRouteData(userid);
+      }else{
+        Notify.snackbar(json['errorMsg'],"");
+      }
+      return routeModelFromJson(response.body);
+    } else {
+      throw Exception('Failed to load album');
+    }
+  }
+}
+
+class CancelofferApi {
+  static var client = http.Client();
+
+  static Future<StaffshiftDashboardResponce> fetchRouteData(
+      String userid,String id) async {
+    var headers = {'Content-Type': 'application/json'};
+    var url =
+    Uri.parse(AppUrls.baseUrl + AppUrls.cancel_offer_grab);
+    Map body = {
+      'user_id': userid,
+      'id':id
+    };
+    http.Response response;
+    EasyLoading.show(status: 'loading...');
+    response=await http.post(url, body: jsonEncode(body), headers: headers);
+    EasyLoading.dismiss();
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      if (json['errorCode'] == "0") {
+
+        // ProcedureApiService.fetchRouteData(userid);
       }else{
         Notify.snackbar(json['errorMsg'],"");
       }
